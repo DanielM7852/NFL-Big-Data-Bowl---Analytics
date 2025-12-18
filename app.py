@@ -43,56 +43,42 @@ sns.set_palette("husl")
 # DATA LOADING (data/ + data/train/)
 # ========================================
 @st.cache_data
+@st.cache_data
 def load_all_data():
     """
-    Uses the layout visible in your screenshots:
-
-    NFL-Redzone-Analytics/
-      app.py
-      data/
-        supplementary_data.csv
-        nfl_redzone_playbook_optimal.csv
-        positioning_*.png
-        train/
-          input_2023_w01.csv ... input_2023_w18.csv
-          output_2023_w01.csv ... output_2023_w18.csv   # you must add these
+    Robust loader for:
+      <repo_root>/data/supplementary_data.csv
+      <repo_root>/data/train/input_2023_w01.csv ... w18
+      <repo_root>/data/train/output_2023_w01.csv ... w18
     """
-    base_path = "data"
-    train_folder = os.path.join(base_path, "train")
+    import pathlib
 
-    # Basic debug so you can see what Streamlit Cloud sees
-    st.write("CWD:", os.getcwd())
-    st.write("Root files:", os.listdir())
+    # Resolve absolute paths from this app.py location
+    app_dir = pathlib.Path(__file__).parent.resolve()
+    data_dir = app_dir / "data"
+    train_dir = data_dir / "train"
 
-    if not os.path.exists(base_path):
-        st.error("❌ 'data/' folder not found in repo root.")
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
-
-    st.write("data/ files:", os.listdir(base_path))
-
-    if not os.path.exists(train_folder):
-        st.error("❌ 'data/train/' folder not found. Create it and add the input_2023_wXX.csv and output_2023_wXX.csv files.")
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
-
-    st.write("train/ files:", os.listdir(train_folder))
+    st.write("app_dir:", app_dir)
+    st.write("data_dir exists:", data_dir.exists(), "contents:", list(data_dir.glob("*")))
+    st.write("train_dir exists:", train_dir.exists(), "contents:", list(train_dir.glob("*")))
 
     # ---------- supplementary ----------
-    supp_path = os.path.join(base_path, "supplementary_data.csv")
+    supp_path = data_dir / "supplementary_data.csv"
     try:
         st.info(f"⏳ Loading supplementary data from {supp_path} ...")
         supp_df = pd.read_csv(supp_path)
         st.success(f"✅ Loaded supplementary data: {supp_df.shape}")
     except Exception as e:
-        st.error(f"❌ Error loading supplementary_data.csv: {e}")
+        st.error(f"❌ Error loading {supp_path.name}: {e}")
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-    # ---------- input (18 weeks) ----------
+    # ---------- input ----------
     st.info("⏳ Loading input tracking data (18 weeks)...")
     input_dfs = []
     for week in range(1, 19):
         week_str = str(week).zfill(2)
-        fpath = os.path.join(train_folder, f"input_2023_w{week_str}.csv")
-        if os.path.exists(fpath):
+        fpath = train_dir / f"input_2023_w{week_str}.csv"
+        if fpath.exists():
             try:
                 df = pd.read_csv(fpath)
                 df["week"] = week
@@ -109,13 +95,13 @@ def load_all_data():
     input_df = pd.concat(input_dfs, ignore_index=True)
     st.success(f"✅ Loaded input data: {input_df.shape}")
 
-    # ---------- output (18 weeks) ----------
+    # ---------- output ----------
     st.info("⏳ Loading output tracking data (18 weeks)...")
     output_dfs = []
     for week in range(1, 19):
         week_str = str(week).zfill(2)
-        fpath = os.path.join(train_folder, f"output_2023_w{week_str}.csv")
-        if os.path.exists(fpath):
+        fpath = train_dir / f"output_2023_w{week_str}.csv"
+        if fpath.exists():
             try:
                 df = pd.read_csv(fpath)
                 df["week"] = week
@@ -126,7 +112,7 @@ def load_all_data():
             st.warning(f"⚠️ Missing output file for week {week}: {fpath}")
 
     if not output_dfs:
-        st.error("❌ No output_2023_wXX.csv files found in data/train/. Add them to unlock full functionality.")
+        st.error("❌ No output_2023_wXX.csv files found in data/train/.")
         return supp_df, input_df, pd.DataFrame()
 
     output_df = pd.concat(output_dfs, ignore_index=True)

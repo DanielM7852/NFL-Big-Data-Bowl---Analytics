@@ -10,6 +10,11 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+try:
+    load_all_data.clear()
+except Exception:
+    pass
+
 # ========================================
 # PAGE CONFIGURATION
 # ========================================

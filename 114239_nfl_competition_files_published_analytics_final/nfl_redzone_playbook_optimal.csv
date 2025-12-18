@@ -1,0 +1,10 @@
+Interval,Formation,Alignment,Route,vs Coverage,TD Count,Receiver Avg Speed,Receiver Optimal Accel,Avg Starting Position
+5-10 yards,SHOTGUN,3x1,FLAT,MAN_COVERAGE,7,4.31 yd/s,3.88 yd/s²,"(42.1, 25.7)"
+5-10 yards,SHOTGUN,3x1,POST,MAN_COVERAGE,6,3.90 yd/s,4.08 yd/s²,"(60.1, 27.8)"
+5-10 yards,SHOTGUN,2x2,OUT,MAN_COVERAGE,6,3.97 yd/s,3.93 yd/s²,"(56.8, 24.0)"
+5-10 yards,SHOTGUN,3x1,SLANT,MAN_COVERAGE,6,3.28 yd/s,3.58 yd/s²,"(68.4, 28.5)"
+5-10 yards,EMPTY,3x2,CORNER,MAN_COVERAGE,5,4.11 yd/s,3.92 yd/s²,"(77.3, 24.2)"
+10-15 yards,SHOTGUN,2x2,GO,ZONE_COVERAGE,8,3.84 yd/s,3.56 yd/s²,"(79.2, 30.2)"
+10-15 yards,SHOTGUN,3x1,POST,ZONE_COVERAGE,6,4.80 yd/s,4.13 yd/s²,"(44.7, 27.8)"
+15-20 yards,SHOTGUN,2x2,GO,MAN_COVERAGE,10,3.99 yd/s,3.50 yd/s²,"(63.0, 24.2)"
+15-20 yards,SHOTGUN,3x1,GO,ZONE_COVERAGE,8,3.93 yd/s,3.69 yd/s²,"(62.6, 27.1)"

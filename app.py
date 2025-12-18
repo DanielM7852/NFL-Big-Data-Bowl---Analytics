@@ -361,6 +361,7 @@ st.markdown("---")
 with st.spinner("Loading NFL data (this may take a moment)..."):
     supp_df, input_df, output_df = load_all_data()
     if supp_df.empty or input_df.empty or output_df.empty:
+        st.error("Data failed to load completely. Check logs for missing files or path issues.")
         st.stop()
     redzone_df, play_summary, successful_plays = process_data(supp_df, input_df, output_df)
 

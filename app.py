@@ -10,7 +10,9 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-# ========= PAGE CONFIG =========
+# ========================================
+# PAGE CONFIGURATION
+# ========================================
 st.set_page_config(
     page_title="🏈 NFL Red Zone Analytics Dashboard",
     page_icon="🏈",
@@ -37,11 +39,14 @@ st.markdown("""
 plt.style.use("default")
 sns.set_palette("husl")
 
-# ========= DATA LOADING (FIXED FOR data/train/) =========
+# ========================================
+# DATA LOADING (data/ + data/train/)
+# ========================================
 @st.cache_data
 def load_all_data():
     """
     Expect this structure in the repo root:
+
       data/
         supplementary_data.csv
         train/
@@ -51,57 +56,84 @@ def load_all_data():
     base_path = "data"
     train_folder = os.path.join(base_path, "train")
 
+    # Basic debug so you can see what Streamlit sees
     st.write("CWD:", os.getcwd())
     st.write("Root files:", os.listdir())
+
+    if not os.path.exists(base_path):
+        st.error("❌ 'data/' folder not found in repo root.")
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+
     st.write("data/ files:", os.listdir(base_path))
+
+    if not os.path.exists(train_folder):
+        st.error("❌ 'data/train/' folder not found. Create it and add input_2023_wXX.csv & output_2023_wXX.csv.")
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+
     st.write("train/ files:", os.listdir(train_folder))
 
-    # supplementary
+    # ---------- supplementary ----------
     supp_path = os.path.join(base_path, "supplementary_data.csv")
-    st.info(f"⏳ Loading supplementary data from {supp_path} ...")
-    supp_df = pd.read_csv(supp_path)
-    st.success(f"✅ Loaded supplementary data: {supp_df.shape}")
+    try:
+        st.info(f"⏳ Loading supplementary data from {supp_path} ...")
+        supp_df = pd.read_csv(supp_path)
+        st.success(f"✅ Loaded supplementary data: {supp_df.shape}")
+    except Exception as e:
+        st.error(f"❌ Error loading supplementary_data.csv: {e}")
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-    # input
+    # ---------- input (18 weeks) ----------
     st.info("⏳ Loading input tracking data (18 weeks)...")
     input_dfs = []
     for week in range(1, 19):
         week_str = str(week).zfill(2)
         fpath = os.path.join(train_folder, f"input_2023_w{week_str}.csv")
         if os.path.exists(fpath):
-            df = pd.read_csv(fpath)
-            df["week"] = week
-            input_dfs.append(df)
+            try:
+                df = pd.read_csv(fpath)
+                df["week"] = week
+                input_dfs.append(df)
+            except Exception as e:
+                st.warning(f"⚠️ Error loading input week {week}: {e}")
         else:
             st.warning(f"⚠️ Missing input file for week {week}: {fpath}")
+
     if not input_dfs:
         st.error("❌ No input_2023_wXX.csv files found in data/train/.")
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+        return supp_df, pd.DataFrame(), pd.DataFrame()
+
     input_df = pd.concat(input_dfs, ignore_index=True)
     st.success(f"✅ Loaded input data: {input_df.shape}")
 
-    # output
+    # ---------- output (18 weeks) ----------
     st.info("⏳ Loading output tracking data (18 weeks)...")
     output_dfs = []
     for week in range(1, 19):
         week_str = str(week).zfill(2)
         fpath = os.path.join(train_folder, f"output_2023_w{week_str}.csv")
         if os.path.exists(fpath):
-            df = pd.read_csv(fpath)
-            df["week"] = week
-            output_dfs.append(df)
+            try:
+                df = pd.read_csv(fpath)
+                df["week"] = week
+                output_dfs.append(df)
+            except Exception as e:
+                st.warning(f"⚠️ Error loading output week {week}: {e}")
         else:
             st.warning(f"⚠️ Missing output file for week {week}: {fpath}")
+
     if not output_dfs:
         st.error("❌ No output_2023_wXX.csv files found in data/train/.")
         return supp_df, input_df, pd.DataFrame()
+
     output_df = pd.concat(output_dfs, ignore_index=True)
     st.success(f"✅ Loaded output data: {output_df.shape}")
 
     st.success("🎉 ALL DATA LOADED SUCCESSFULLY!")
     return supp_df, input_df, output_df
 
-# ========= DATA PROCESSING =========
+# ========================================
+# DATA PROCESSING
+# ========================================
 @st.cache_data
 def process_data(supp_df, input_df, output_df):
     merged_df = pd.merge(input_df, supp_df, on=["game_id", "play_id"], how="inner")
@@ -141,7 +173,9 @@ def process_data(supp_df, input_df, output_df):
     successful_plays = play_summary[play_summary["is_touchdown"]].copy()
     return redzone_df, play_summary, successful_plays
 
-# ========= HELPERS =========
+# ========================================
+# HELPER FUNCTIONS
+# ========================================
 def calculate_accel_effort_pct(accel_yd_per_sec2):
     REDZONE_ACCEL_MAX = 2.5
     if accel_yd_per_sec2 is None:
@@ -322,7 +356,9 @@ def get_enhanced_recommendations_final(yards_out, defense_type, play_summary, su
         "data": df_results.head(5).to_dict("records"),
     }
 
-# ========= MAIN APP =========
+# ========================================
+# MAIN APP
+# ========================================
 st.title("🏈 NFL Red Zone Analytics Dashboard")
 st.markdown("*Defender Distance & Separation Strategy Analysis*")
 st.markdown("---")

@@ -1,5 +1,5 @@
 # NFL Red Zone Play Sheet
-![Catch Rate vs Distance](figures/catch_rate_distance.png) for images
+
 ---
 
 ## Overview
@@ -9,6 +9,7 @@ This project aims to identify optimal red zone play
 strategies by analyzing broad offensive schemes and player kinematic tracking data.
 In the end, we built a dashboard that allows coaches and players to make split-second decisions by identifying optimal play patterns 5–20 yards from the end zone, including recommended alignments, routes, and acceleration based on predicted defensive coverage. Coaches can also interactively adjust defender angle and distance relative to a targeted receiver to see how alignment affects catch probability.
 
+![Finished Dashboard](NFL%20screenshots/Full%20Dashboard.png)
 ---
 
 ## Objectives
@@ -64,7 +65,7 @@ In the end, we built a dashboard that allows coaches and players to make split-s
 ---
 
 ## Project Links
-- [pdf to Writeup](#)
+- [pdf to Writeup](Red%20Zone%20Play%20Sheet%20Writeup.pdf)
 - [Kaggle Notebook](https://www.kaggle.com/code/karstenlowe0/nfl-analytics-dashboard-final-version/edit)
 
 ---
